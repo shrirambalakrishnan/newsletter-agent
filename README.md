@@ -16,3 +16,32 @@ Read the newsletter and present it in an easy-to-consume format
 - Provide easy to understand content
 - Ask questions to make the content stick to user
 - Update the knowledge learnt by the user so that future learnings on this topic could build on top of what is already available.
+
+### Roadmap
+
+- v0 - CloudRun deployment
+	- Simple agent with one or two tools usage
+- v1 - Generic Summarization of NewsLetter
+    - Basic gemini integration
+    - Define input for agent
+    - Define how an agent is invoked
+    - Setup e2e flow
+- v2 - MCQ question list creation (backend)
+    - Assumptions 
+	    - Course creation can be done later
+	    - The content of course can any ways be read from the newsletter content itself
+    - Knowledge model 
+	    - Concepts to be decided here for every mcq question
+- v3 - MCQ question list creation (rendering)
+    - Rendering should be as simple as possible
+    - Do not complicate this
+- v4 - Feedback Loop
+	- User answers are the feedback from user here
+	- Update knowledge model - based on answers to mcq
+- v5 - Tailored Summarization
+    - Make use of knowledge model
+    - Summarize based on knowledge model
+	    - Explain unknown concepts more than known concepts
+- v6 - Pre-requisites section to "Summary" (if time permits)
+- v7 - Course Creation (if time permits)
+- v8 - Misconception Distractions for wrong options in the MCQ (if time permits)

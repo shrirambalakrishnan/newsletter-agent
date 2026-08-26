@@ -1,0 +1,19 @@
+{
+  "name": "newsletter-agent",
+  "version": "1.0.0",
+  "description": "Automate knowledge extraction from newsletters and make it easily understandable to user",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shrirambalakrishnan/newsletter-agent.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shrirambalakrishnan/newsletter-agent/issues"
+  },
+  "homepage": "https://github.com/shrirambalakrishnan/newsletter-agent#readme"
+}

@@ -1,0 +1,30 @@
+{
+  "name": "newsletter-agent",
+  "version": "1.0.0",
+  "description": "Automate knowledge extraction from newsletters and make it easily understandable to user",
+  "main": "agent.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shrirambalakrishnan/newsletter-agent.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shrirambalakrishnan/newsletter-agent/issues"
+  },
+  "homepage": "https://github.com/shrirambalakrishnan/newsletter-agent#readme",
+  "dependencies": {
+    "@google/adk": "2.0.0",
+    "dotenv": "17.4.2"
+  },
+  "devDependencies": {
+    "@google/adk-devtools": "2.0.0",
+    "@types/node": "26.3.0",
+    "tsx": "4.23.12",
+    "typescript": "7.0.2"
+  },
+  "type": "module"
+}

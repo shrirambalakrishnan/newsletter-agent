@@ -1,3 +1,7 @@
 node_modules
 
 .env
+
+newsletters-contents
+
+.DS_Store

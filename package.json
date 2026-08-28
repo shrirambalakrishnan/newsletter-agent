@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/shrirambalakrishnan/newsletter-agent#readme",
   "dependencies": {
+    "@google-cloud/firestore": "9.0.0",
     "@google/adk": "2.0.0",
     "dotenv": "17.4.2"
   },

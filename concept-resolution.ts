@@ -1,20 +1,23 @@
 import { LlmAgent } from "@google/adk";
 import {z} from "zod";
+import { Concept, createConcepts, NEW_CONCEPT_DEFAULTS } from "./db/models/concept";
+
+export const resolvedConceptSchema = z.object({
+  label: z.string(),
+  evidence: z.string(),
+  action: z.enum(["reuse", "create"]),
+  conceptId: z
+    .string()
+    .describe(
+      "If action is reuse, the existing conceptId is matched. If action is create, new slug-style conceptId for this concept."
+    )
+})
 
 export const conceptResolutionOutputSchema = z.object({
-  resolvedConcepts: z.array(
-    z.object({
-      label: z.string(),
-      evidence: z.string(),
-      action: z.enum(["reuse", "create"]),
-      conceptId: z
-        .string()
-        .describe(
-          "If action is reuse, the existing conceptId is matched. If action is create, new slug-style conceptId for this concept."
-        )
-    })
-  )
+  resolvedConcepts: z.array(resolvedConceptSchema)
 })
+
+export type ResolvedConcept = z.infer<typeof resolvedConceptSchema>
 
 export const conceptResolutionAgent = new LlmAgent({
   name: "concept_resolution_agent",
@@ -32,3 +35,15 @@ export const conceptResolutionAgent = new LlmAgent({
   outputSchema: conceptResolutionOutputSchema,
   tools: [],
 })
+
+
+
+export async function persistNewConcepts(resolvedConcepts: ResolvedConcept[]): Promise<void> {
+
+  const newConcepts = resolvedConcepts
+    .filter( concept => concept.action == "create")
+    .map( concept => ( {conceptId: concept.conceptId, label: concept.label, ...NEW_CONCEPT_DEFAULTS} ) )
+    
+
+  await createConcepts(newConcepts)
+}

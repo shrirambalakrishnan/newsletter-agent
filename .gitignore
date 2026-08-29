@@ -6,4 +6,4 @@ newsletters-contents
 
 .DS_Store
 
-db/smoke-test.ts
+db/smoke-test*.ts

@@ -31,14 +31,13 @@ app.post("/api/newsletter", async(req, res) => {
   }
 
   try {
-    const concepts = await ingestNewsletter(content)
-    res.json({concepts})
+    const {concepts, questions, quiz} = await ingestNewsletter(content)
+    res.json({quizId: quiz.id, concepts, questions})
   } catch (err) {
     console.error("ingest failed", err)
     res.status(500).json({error: String(err)})
   }
 
-  res.json({stub: true, receivedChars: content.length})
 })
 
 app.use((req, res) => {

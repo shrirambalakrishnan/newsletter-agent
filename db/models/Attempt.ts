@@ -7,6 +7,7 @@ export interface AnswerRecord {
   questionId: string
   conceptId: string
   selectedIndex: number | null
+  isCorrect: boolean | null
 }
 
 export interface Attempt {

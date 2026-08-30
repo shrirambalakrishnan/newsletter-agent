@@ -6,6 +6,7 @@ import { getQuestions } from "./db/models/question"
 import { renderQuizPage } from "./render"
 import { parseAnswers } from "./db/models/answer"
 import { applyAnswers, createAttempt } from "./db/models/Attempt"
+import { getNewsletter } from "./db/models/newsletter"
 
 const app = express()
 app.use((req, _res, next) => {
@@ -36,8 +37,8 @@ app.post("/api/newsletter", async(req, res) => {
   }
 
   try {
-    const {concepts, questions, quiz} = await ingestNewsletter(content)
-    res.json({quizId: quiz.id, concepts, questions})
+    const {newsletter, concepts, questions, quiz} = await ingestNewsletter(content)
+    res.json({quizId: quiz.id, concepts, questions, newsletter})
   } catch (err) {
     console.error("ingest failed", err)
     res.status(500).json({error: String(err)})
@@ -65,7 +66,12 @@ app.get("/quiz/:id", async(req, res) => {
       )
     }
 
-    res.type("html").send(renderQuizPage(quiz, questions))
+    const newsletter = await getNewsletter(quiz.newsletterId)
+    if(!newsletter) {
+      return res.status(404).type("html").send("Newsletter not found")
+    }
+    
+    res.type("html").send(renderQuizPage(newsletter, quiz, questions))
   } catch(err) {
     console.error("render quiz failed - ", err)
     res.status(500).type("html").send("Something went wrong!")

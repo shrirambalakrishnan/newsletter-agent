@@ -1,6 +1,6 @@
 import {z} from "zod"
 import { conceptExtractionAgent, conceptExtractionOutputSchema } from "./concept-extraction"
-import { runAgent } from "./run-agent"
+import { runAgent, runAgentText } from "./run-agent"
 import { listConcepts } from "./db/models/concept"
 import { conceptResolutionAgent, conceptResolutionOutputSchema, persistNewConcepts, ResolvedConcept } from "./concept-resolution"
 import { createQuiz, hashNewsletterContent, Quiz } from "./db/models/quiz"
@@ -8,6 +8,9 @@ import { questionGenerationAgent, questionGenerationOutputSchema, toQuestions } 
 import { createQuestions, Question } from "./db/models/question"
 import { setDefaultAutoSelectFamily } from "node:net"
 import { SEED_USER, setDefaultUser } from "./db/models/user"
+import { rootAgent } from "./agent"
+import { createNewsletter, newNewsletterId, Newsletter } from "./db/models/newsletter"
+import { Timestamp } from "@google-cloud/firestore"
 
 type ConceptResolutionOutputSchemaType = z.infer<typeof conceptResolutionOutputSchema>
 
@@ -15,9 +18,25 @@ export interface IngestResult {
   concepts: ResolvedConcept[]
   questions: Question[]
   quiz: Quiz
+  newsletter: Newsletter
 }
 
 export async function ingestNewsletter(newsletterText: string): Promise<IngestResult> {
+  // step 0
+  const summary = await runAgentText(
+    rootAgent,
+    newsletterText,
+  )
+  console.log("summary generated")
+
+  const newsletter = {
+    id: newNewsletterId(), 
+    content: newsletterText, 
+    summary, 
+    createdAt: Timestamp.now()
+  }
+  await createNewsletter(newsletter)
+  
   // step 1
   const extraction = await runAgent<z.infer<typeof conceptExtractionOutputSchema>>(
     conceptExtractionAgent,
@@ -76,8 +95,9 @@ export async function ingestNewsletter(newsletterText: string): Promise<IngestRe
     newsletterContent: newsletterText,
     questionIds: questions.map(q => q.id),
     userId: SEED_USER.id,
+    newsletterId: newsletter.id,
   })
   console.log("quiz created = ", quiz.id)
 
-  return { concepts: resolution.resolvedConcepts, questions, quiz}
+  return { newsletter,  concepts: resolution.resolvedConcepts, questions, quiz}
 }

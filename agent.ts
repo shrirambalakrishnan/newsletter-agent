@@ -1,8 +1,9 @@
+import "dotenv/config"
 import {LlmAgent} from '@google/adk';
 
 export const rootAgent = new LlmAgent({
   name: 'newsletter_agent',
-  model: 'gemini-3.6-flash',
+  model: process.env.GEMINI_MODEL,
   description: 'Summarizes newsletters.',
   instruction: [
     'Summarize the newsletter user provides.',

@@ -9,6 +9,7 @@ export interface Quiz {
   questionIds: string[]
   createdAt: Timestamp
   userId: string
+  newsletterId: string
 }
 
 export function hashNewsletterContent(newsletterContent:string): string {
@@ -28,7 +29,7 @@ export async function getQuiz(id: string): Promise<Quiz|null> {
 }
 
 
-export type NewQuiz = Pick<Quiz, "newsletterContent" | "questionIds" | "userId">
+export type NewQuiz = Pick<Quiz, "newsletterContent" | "questionIds" | "userId" | "newsletterId">
 export async function createQuiz(newQuiz: NewQuiz): Promise<Quiz> {
   const quiz : Quiz = {
     id: randomUUID(),
@@ -37,6 +38,7 @@ export async function createQuiz(newQuiz: NewQuiz): Promise<Quiz> {
     questionIds: newQuiz.questionIds,
     createdAt: Timestamp.now(),
     userId: newQuiz.userId,
+    newsletterId: newQuiz.newsletterId
   }
 
   await db.collection("quizzes").doc(quiz.id).set(quiz)

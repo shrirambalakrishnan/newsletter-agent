@@ -1,5 +1,6 @@
 import { LlmAgent } from "@google/adk";
 import z, { string } from "zod";
+import { newQuestionId, Question } from "./db/models/question";
 
 export const generatedQuestionSchema = z.object({
   conceptId: z
@@ -47,3 +48,42 @@ export const questionGenerationAgent = new LlmAgent({
   outputSchema: questionGenerationOutputSchema,
   tools: []
 })
+
+export function toQuestions(
+  generatedQuestions: GeneratedQuestion[],
+  conceptIds: string[]
+): Question[] {
+
+  const allowedConceptIds = new Set(conceptIds)
+
+  return generatedQuestions
+  .filter( candidate => {
+
+    if ( !allowedConceptIds.has(candidate.conceptId) ) {
+      console.warn("invalid conceptId. dropping question")
+      return false
+    }
+    
+    if (
+      !Number.isInteger(candidate.correctIndex) ||
+      candidate.correctIndex < 0 ||
+      candidate.correctIndex > candidate.options.length 
+    ) {
+      console.warn("invalid correct option ID. dropping question")
+      return false
+    }
+
+    return true
+  })
+  .map( candidate => ({
+
+    id: newQuestionId(candidate.conceptId),
+    conceptId: candidate.conceptId,
+    questionText: candidate.questionText,
+    options: candidate.options,
+    correctIndex: candidate.correctIndex,
+    difficulty: candidate.difficulty,
+    
+  }))
+  
+}

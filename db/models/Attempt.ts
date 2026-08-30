@@ -2,6 +2,7 @@ import { Timestamp } from "@google-cloud/firestore"
 import { db } from "../firestore"
 import { randomUUID } from "node:crypto"
 import { timestampAdd } from "@google-cloud/firestore/pipelines"
+import { getConcept, nextConfidence, updateConceptKnowledge } from "./concept"
 
 export interface AnswerRecord {
   questionId: string
@@ -44,4 +45,31 @@ export async function createAttempt(newAttempt: NewAttempt): Promise<Attempt> {
   await db.collection("attempts").doc(attempt.id).set(attempt)
 
   return attempt
+}
+
+export async function applyAnswers(answers: AnswerRecord[]): Promise<void> {
+  for(const answer of answers) {
+
+    if(answer.isCorrect === null) {
+      continue
+    }
+
+    const concept = await getConcept(answer.conceptId)
+    if(!concept) {
+      console.warn("concept not found for answer. skipping update")
+      continue
+    }
+
+    const confidenceNewValue = nextConfidence(concept.confidence, answer.isCorrect)
+    console.log(
+      `conceptId - ${answer.conceptId} | current value = ${concept.confidence} | new value = ${confidenceNewValue}`
+    )
+
+    await updateConceptKnowledge(
+      answer.conceptId,
+      confidenceNewValue,
+      concept.evidenceCount + 1
+    )
+    
+  }
 }

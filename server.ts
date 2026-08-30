@@ -5,7 +5,7 @@ import { getQuiz } from "./db/models/quiz"
 import { getQuestions } from "./db/models/question"
 import { renderQuizPage } from "./render"
 import { parseAnswers } from "./db/models/answer"
-import { createAttempt } from "./db/models/Attempt"
+import { applyAnswers, createAttempt } from "./db/models/Attempt"
 
 const app = express()
 app.use((req, _res, next) => {
@@ -94,6 +94,9 @@ app.post("/quiz/:id/submit", async (req, res) => {
     })
     console.log("attempt created = ", attempt.id)
 
+    await applyAnswers(answers)
+    console.log("concept confidence updated")
+    
     res.type("html").send("<h1>Answers received!</h1>")
   } catch(err) {
     console.error("submit answers failed - ", err)

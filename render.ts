@@ -1,3 +1,5 @@
+import { marked } from "marked";
+import { Newsletter } from "./db/models/newsletter";
 import { Question } from "./db/models/question";
 import { Quiz } from "./db/models/quiz";
 
@@ -11,6 +13,14 @@ const PAGE_STYLES = `
   .difficulty {font-weight: 0.8rem; color: #767676; font-weight: 400; margin-left:0.5rem}
   button { font-size: 1rem;padding: 0.6rem 1.2rem; cursor:pointer;}
 `
+
+function renderSummary(summary: string): string {
+  if(!summary?.trim()) {
+    return `<p class="empty">No summary available</p>`
+  } else {
+    return `<div class="summary-body">${marked.parse(summary)}</div>`
+  }
+}
 
 function renderOption(question: Question, optionText: string, index: number): string {
 
@@ -44,7 +54,7 @@ function renderQuestion(question: Question, position: number): string {
     `
 }
 
-export function renderQuizPage(quiz: Quiz, questions: Question[]): string {
+export function renderQuizPage(newsletter: Newsletter, quiz: Quiz, questions: Question[]): string {
 
   const action = `/quiz/${quiz.id}/submit`
   const body = questions
@@ -59,9 +69,12 @@ export function renderQuizPage(quiz: Quiz, questions: Question[]): string {
         <style>${PAGE_STYLES}</style>
       </head>
       <body>
-        <h1>What did you take away?</h1>
-        <section id="summary"></section>
+        <h1>Summary of Newsletter</h1>
+        <section id="summary">
+          ${renderSummary(newsletter.summary)}
+        </section>
 
+        <h1>Take the quiz to check your understanding</h1>
         <form method="post" action="${action}">
           ${body}
           <button type="submit">Submit Answers!</button>

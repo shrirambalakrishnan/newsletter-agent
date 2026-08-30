@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { LlmAgent } from "@google/adk";
 import {z} from "zod";
 import { Concept, createConcepts, NEW_CONCEPT_DEFAULTS } from "./db/models/concept";
@@ -21,7 +22,7 @@ export type ResolvedConcept = z.infer<typeof resolvedConceptSchema>
 
 export const conceptResolutionAgent = new LlmAgent({
   name: "concept_resolution_agent",
-  model: "gemini-3.6-flash",
+  model: process.env.GEMINI_MODEL,
   description: "Decides whether extracted concepts match existing ones or are genuinely new",
   instruction: [
     "You will receive JSON object with two fields: candidates (concepts just extracted from a newsletter) and existingConcepts (concepts already known from previous newsletters with conceptId and label)",

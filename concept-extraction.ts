@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { LlmAgent } from "@google/adk";
 import {z} from "zod"
 
@@ -16,7 +17,7 @@ export const conceptExtractionOutputSchema = z.object({
 
 export const conceptExtractionAgent = new LlmAgent({
   name: "concept_extraction_agent",
-  model: "gemini-3.6-flash",
+  model: process.env.GEMINI_MODEL,
   description: "Extracts candidate concepts discussed in newsleteer content",
   instruction: [
     "Read the newsletter content the user provides",

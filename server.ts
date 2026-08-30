@@ -1,6 +1,9 @@
 import "dotenv/config"
 import express from "express"
 import { ingestNewsletter } from "./ingest"
+import { getQuiz } from "./db/models/quiz"
+import { getQuestions } from "./db/models/question"
+import { renderQuizPage } from "./render"
 
 const app = express()
 app.use((req, _res, next) => {
@@ -38,6 +41,33 @@ app.post("/api/newsletter", async(req, res) => {
     res.status(500).json({error: String(err)})
   }
 
+})
+
+app.get("/quiz/:id", async(req, res) => {
+  try {
+    const quiz = await getQuiz(req.params.id)
+
+    if(!quiz) {
+      return res.status(404).type("html").send("Quiz not found")
+    }
+
+    const questions = await getQuestions(quiz.questionIds)
+
+    if(questions.length != quiz.questionIds.length) {
+      console.warn(
+        `
+          quiz - ${quiz.id},
+          expected questions count - ${quiz.questionIds.length},
+          loaded questions count - ${questions.length}
+        `
+      )
+    }
+
+    res.type("html").send(renderQuizPage(quiz, questions))
+  } catch(err) {
+    console.error("render quiz failed - ", err)
+    res.status(500).type("html").send("Something went wrong!")
+  }
 })
 
 app.use((req, res) => {

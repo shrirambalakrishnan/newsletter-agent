@@ -38,3 +38,25 @@ export async function listConcepts(): Promise<Concept[]> {
 
   return conceptsSnapshot.docs.map((doc) => doc.data() as Concept)
 }
+
+const CORRECT_GAIN = 0.2
+const WRONG_DECAY = 0.4
+export function nextConfidence(current: number, isCorrect: boolean): number {
+  const updated = isCorrect
+    ? current + (1-current) * CORRECT_GAIN
+    : current * WRONG_DECAY
+  
+  return updated
+}
+
+export async function updateConceptKnowledge(
+  conceptId: string,
+  confidence: number, 
+  evidenceCount: number
+): Promise<void> {
+  await db.collection("concepts").doc(conceptId).update({
+    confidence,
+    evidenceCount,
+    lastTestedAt: Timestamp.now(),
+  })
+}

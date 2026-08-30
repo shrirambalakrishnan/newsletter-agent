@@ -18,11 +18,13 @@ export function parseAnswers(
     const optionSelected = typeof optionSelectedRaw == "string" ? Number.parseInt(optionSelectedRaw, 10) : NaN
     
     const valid = Number.isInteger(optionSelected) && optionSelected >=0 && optionSelected < question.options.length
+    const selectedIndex = valid ? optionSelected : null
 
     return {
       questionId: question.id,
       conceptId: question.conceptId,
-      selectedIndex: valid ? optionSelected : null
+      selectedIndex: valid ? optionSelected : null,
+      isCorrect: selectedIndex == null ? null : selectedIndex == question.correctIndex
     }
   })
   

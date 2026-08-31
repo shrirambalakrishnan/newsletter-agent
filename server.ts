@@ -114,6 +114,19 @@ app.get("/", async(req, res) => {
   res.type("html").send(renderHomePage())
 })
 
+app.post("/newsletter", async(req, res) => {
+  const content = (req.body?.newsletterContent ?? "").trim()
+  if(!content){
+    return res.redirect(303, "/")
+  }
+
+  console.log("ingest starting, chars = ", content.length)
+  const {quiz} = await ingestNewsletter(content)
+  console.log("ingest done. quiz = ", quiz.id)
+
+  res.redirect(303, `/quiz/${quiz.id}`)
+})
+
 app.use((req, res) => {
   res.status(404).json({ error: "no route", method: req.method, path: req.originalUrl })
 })

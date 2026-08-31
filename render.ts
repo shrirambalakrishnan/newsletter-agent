@@ -100,7 +100,7 @@ export function renderHomePage(): string {
         <h2>Paste a Newsletter</h2>
         <p class="hint">Plain text only. You will get summary and a short quiz</p>
 
-        <form id="newsletter-form" method="post" action"/newsletter">
+        <form id="newsletter-form" method="post" action="/newsletter">
           <textarea
             name="newsletterContent"
             rows="12"

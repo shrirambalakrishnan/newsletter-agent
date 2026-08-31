@@ -3,7 +3,7 @@ import express from "express"
 import { ingestNewsletter } from "./ingest"
 import { getQuiz } from "./db/models/quiz"
 import { getQuestions } from "./db/models/question"
-import { renderQuizPage } from "./render"
+import { renderHomePage, renderQuizPage } from "./render"
 import { parseAnswers } from "./db/models/answer"
 import { applyAnswers, createAttempt } from "./db/models/Attempt"
 import { getNewsletter } from "./db/models/newsletter"
@@ -108,6 +108,23 @@ app.post("/quiz/:id/submit", async (req, res) => {
     console.error("submit answers failed - ", err)
     res.status(500).type("html").send("Somthing went wrong!")
   }
+})
+
+app.get("/", async(req, res) => {
+  res.type("html").send(renderHomePage())
+})
+
+app.post("/newsletter", async(req, res) => {
+  const content = (req.body?.newsletterContent ?? "").trim()
+  if(!content){
+    return res.redirect(303, "/")
+  }
+
+  console.log("ingest starting, chars = ", content.length)
+  const {quiz} = await ingestNewsletter(content)
+  console.log("ingest done. quiz = ", quiz.id)
+
+  res.redirect(303, `/quiz/${quiz.id}`)
 })
 
 app.use((req, res) => {

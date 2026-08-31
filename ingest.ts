@@ -6,7 +6,6 @@ import { conceptResolutionAgent, conceptResolutionOutputSchema, persistNewConcep
 import { createQuiz, hashNewsletterContent, Quiz } from "./db/models/quiz"
 import { questionGenerationAgent, questionGenerationOutputSchema, toQuestions } from "./question-generation"
 import { createQuestions, Question } from "./db/models/question"
-import { setDefaultAutoSelectFamily } from "node:net"
 import { SEED_USER, setDefaultUser } from "./db/models/user"
 import { rootAgent } from "./agent"
 import { createNewsletter, newNewsletterId, Newsletter } from "./db/models/newsletter"
@@ -21,7 +20,9 @@ export interface IngestResult {
   newsletter: Newsletter
 }
 
-export async function ingestNewsletter(newsletterText: string): Promise<IngestResult> {
+async function summariseNewsletter(newsletterText: string): Promise<Newsletter> {
+  console.log("summariseNewsletter...")
+  
   // step 0
   const summary = await runAgentText(
     rootAgent,
@@ -36,8 +37,14 @@ export async function ingestNewsletter(newsletterText: string): Promise<IngestRe
     createdAt: Timestamp.now()
   }
   await createNewsletter(newsletter)
+
+  console.log("summariseNewsletter done")
+  return newsletter
+}
+
+async function resolveConcepts(newsletterText: string): Promise<ConceptResolutionOutputSchemaType> {
+  console.log("resolveConcepts...")
   
-  // step 1
   const extraction = await runAgent<z.infer<typeof conceptExtractionOutputSchema>>(
     conceptExtractionAgent,
     newsletterText,
@@ -46,7 +53,7 @@ export async function ingestNewsletter(newsletterText: string): Promise<IngestRe
 
   // step 2
   const existingConcepts = await listConcepts()
-
+  
   // step 3
   const resolutionInput = JSON.stringify({
     candidates: extraction.concepts,
@@ -61,7 +68,18 @@ export async function ingestNewsletter(newsletterText: string): Promise<IngestRe
 
   // step 4
   await persistNewConcepts(resolution.resolvedConcepts)
-  console.log("done")
+  console.log("resolveConcepts done")
+
+  return resolution
+}
+
+export async function ingestNewsletter(newsletterText: string): Promise<IngestResult> {
+  console.log("ingestNewsletter...")
+
+  const [newsletter, resolution] = await Promise.all([
+    summariseNewsletter(newsletterText),
+    resolveConcepts(newsletterText),
+  ])
 
   // step 5
   const questionGenerationInput = JSON.stringify({

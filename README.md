@@ -8,7 +8,7 @@ https://newsletter-agent-602281895803.us-central1.run.app/
 
 ## Demo Video Link
 
-To be added
+https://youtu.be/PMtQuFvrtbo
 
 ## Problem
 
